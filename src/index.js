@@ -1,27 +1,22 @@
-
-const host = process.env.HOST || 'localhost';
-const port = process.env.PORT || 3000;
-const path = require('path')
-
+'use strict';
 const express = require('express');
-const app = express();
-const http = require('http');
-const server = http.createServer(app);
-const { Server } = require("socket.io");
-const io = new Server(server);
-
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+const socketIO = require('socket.io');
+const PORT = process.env.PORT || 3000;
+const INDEX = '/index.html';
+const server = express()
+  .use((req, res) => res.sendFile(INDEX, { root: __dirname }))
+  .listen(PORT, () => console.log(`Listening on ${PORT}`));
+const io = require("socket.io")(server,{
+  cors: {
+    origins: "*:*",
+    methods: ["GET", "POST"]
+  }
 });
-
 io.on('connection', (socket) => {
-  socket.on('chat message', msg => {
-    io.emit('chat message', msg);
+  socket.on('disconnect', () => console.log('Client disconnected'));
+  socket.on('chat message', (args) => {
+    io.emit('chat message', args);
+    console.log(args)
   });
-});
 
-
-
-server.listen(port, host, () => {
-  console.log(`Socket.IO server running at http://${host}:${port}/`);
 });
