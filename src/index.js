@@ -18,3 +18,7 @@ io.on('connection', (socket) => {
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
+
+http.listen(port, host, () => {
+  console.log(`Socket.IO server running at http://${host}:${port}/`);
+});
